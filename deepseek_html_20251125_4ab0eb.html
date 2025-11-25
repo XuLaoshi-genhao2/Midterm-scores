@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生成绩查询系统</title>
+    <style>
+        /* 样式保持不变，与之前相同 */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Microsoft YaHei', sans-serif; }
+        body { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { width: 100%; max-width: 800px; background-color: rgba(255, 255, 255, 0.95); border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); overflow: hidden; }
+        .header { background: linear-gradient(to right, #4a00e0, #8e2de2); color: white; padding: 25px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .content { padding: 30px; }
+        .search-box { display: flex; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; overflow: hidden; }
+        .search-box input { flex: 1; padding: 15px 20px; border: none; font-size: 16px; outline: none; }
+        .search-box button { background: linear-gradient(to right, #4a00e0, #8e2de2); color: white; border: none; padding: 0 25px; cursor: pointer; font-size: 16px; transition: all 0.3s ease; }
+        .search-box button:hover { background: linear-gradient(to right, #3a00c0, #7e1dd2); }
+        .result, .no-result { display: none; }
+        .result.active, .no-result.active { display: block; animation: fadeIn 0.5s ease; }
+        /* 其他样式保持不变 */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>学生成绩查询系统</h1>
+            <p>请输入学号查询期中考试成绩</p>
+        </div>
+        
+        <div class="content">
+            <div class="search-box">
+                <input type="text" id="studentId" placeholder="请输入学号（例如：2025013000）">
+                <button id="searchBtn">查询成绩</button>
+            </div>
+            
+            <div class="result" id="result">
+                <h2>学生成绩信息</h2>
+                <div class="info-row">
+                    <div class="info-label">学号：</div>
+                    <div class="info-value" id="resultId"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">姓名：</div>
+                    <div class="info-value" id="resultName"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">期中成绩：</div>
+                    <div class="info-value">
+                        <span id="resultScore" class="score"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="no-result" id="noResult">
+                <i>🔍</i>
+                <h3>未找到相关信息</h3>
+                <p>请检查学号是否正确，或联系管理员</p>
+            </div>
+            
+            <div class="stats">
+                <h3>成绩统计信息</h3>
+                <p>数据总数：150名学生</p>
+                <p>平均成绩：88.79分</p>
+                <p>最高分：100分，最低分：54分</p>
+                <p>满分(100分)人数：25人</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为了更好的网络性能，将数据分离
+        const studentData = {
+            "2025012999": { name: "曹楠", score: 81 },
+            "2025013000": { name: "段博豪", score: 100 },
+            // ... 其他数据（实际使用时请包含完整数据）
+        };
+
+        // 页面功能代码
+        document.addEventListener('DOMContentLoaded', function() {
+            const studentIdInput = document.getElementById('studentId');
+            const searchBtn = document.getElementById('searchBtn');
+            const resultDiv = document.getElementById('result');
+            const noResultDiv = document.getElementById('noResult');
+            const resultId = document.getElementById('resultId');
+            const resultName = document.getElementById('resultName');
+            const resultScore = document.getElementById('resultScore');
+
+            function searchStudent() {
+                const id = studentIdInput.value.trim();
+                
+                if (id === '') {
+                    alert('请输入学号');
+                    return;
+                }
+                
+                if (studentData[id]) {
+                    const student = studentData[id];
+                    resultId.textContent = id;
+                    resultName.textContent = student.name;
+                    
+                    if (student.score === "缺考") {
+                        resultScore.textContent = "缺考";
+                        resultScore.className = "score";
+                    } else {
+                        resultScore.textContent = student.score + "分";
+                        
+                        if (student.score >= 90) {
+                            resultScore.className = "score score-high";
+                        } else if (student.score >= 70) {
+                            resultScore.className = "score score-medium";
+                        } else {
+                            resultScore.className = "score score-low";
+                        }
+                    }
+                    
+                    resultDiv.classList.add('active');
+                    noResultDiv.classList.remove('active');
+                } else {
+                    resultDiv.classList.remove('active');
+                    noResultDiv.classList.add('active');
+                }
+            }
+
+            searchBtn.addEventListener('click', searchStudent);
+            studentIdInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchStudent();
+            });
+            studentIdInput.focus();
+        });
+    </script>
+</body>
+</html>
